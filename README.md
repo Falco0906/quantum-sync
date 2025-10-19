@@ -1,27 +1,183 @@
 # QuantumSync - AI-Powered Automation Dashboard
 
-> **STATUS: 85% COMPLETE** - Frontend fully built, n8n setup remaining (30 minutes)
-
-A modern, futuristic automation dashboard built with React and n8n for HR recruitment and finance invoice processing.
-
-## ✅ What's Complete
-
-- ✅ **Full React Frontend** - All components, pages, routing (100%)
-- ✅ **Production Build** - Compiled and optimized (134.8 kB)
-- ✅ **API Integration** - Single webhook service ready
-- ✅ **Beautiful UI** - AI-themed with animations
-- ✅ **n8n Workflow Template** - Ready to import
-- ✅ **Complete Documentation** - 12 comprehensive guides
-
-## ⏳ What's Left (30 minutes)
-
-- [ ] Import n8n workflow (2 min)
-- [ ] Add 6 email nodes (20 min)
-- [ ] Test end-to-end (5 min)
-
-**→ Follow `FINAL_SETUP.md` for exact steps!**
+A modern, intelligent automation platform that streamlines HR recruitment and finance invoice processing through AI-powered workflows. Built with React and n8n, QuantumSync combines beautiful user interfaces with powerful backend automation to transform how organizations handle repetitive tasks.
 
 ---
+
+## 🎯 Overview
+
+QuantumSync is an end-to-end automation solution that leverages artificial intelligence to process, analyze, and route HR applications and finance invoices automatically. The platform features a sleek, futuristic dashboard interface connected to sophisticated n8n workflows that handle everything from document parsing to intelligent decision-making and multi-channel notifications.
+
+---
+
+## 🚀 Features
+
+### HR Automation Dashboard
+- **AI Resume Analysis**: Automatically extracts candidate data from resume PDFs including name, email, skills, and experience using advanced parsing algorithms
+- **Smart Scoring System**: AI-powered candidate evaluation that scores applicants on a 0-100 scale based on qualifications and experience
+- **Intelligent Routing**:
+  - High Score (≥80): Automatically sends interview invitation emails
+  - Medium Score (50-79): Routes to HR team for manual review
+  - Low Score (<50): Sends professional rejection emails
+- **Multi-Channel Notifications**: Integrated email and Slack notifications to keep teams informed in real-time
+- **Complete Audit Trail**: All applications logged to Google Sheets for compliance and analytics
+
+### Finance Automation Dashboard
+- **AI Invoice Processing**: Intelligent extraction of invoice details including vendor information, amounts, dates, and line items
+- **Smart Approval Workflows**:
+  - <$500: Automatically approved and processed
+  - $500-$5,000: Routed to manager for approval
+  - ≥$5,000: Escalated to CFO for review
+- **Fraud Detection**: AI-powered duplicate detection and risk analysis to prevent payment fraud
+- **Real-Time Notifications**: Instant email and Slack alerts for all stakeholders
+- **Financial Audit Trail**: Complete transaction logging in Google Sheets for accounting and compliance
+
+---
+
+## 🛠️ Tech Stack
+
+**Frontend:**
+- React 19.2.0 with TypeScript for type-safe development
+- Tailwind CSS for modern, responsive styling
+- Framer Motion for smooth animations and transitions
+- React Router v7 for seamless navigation
+- Axios for robust API communication
+
+**Backend:**
+- n8n Workflow Automation for intelligent process orchestration
+- Webhook-based architecture for real-time processing
+- Multi-node workflows with conditional logic and AI integration
+
+---
+
+## 📦 Installation & Setup
+
+1. **Clone the repository:**
+```bash
+git clone https://github.com/Falco0906/quantum-sync.git
+cd quantum-sync
+```
+
+2. **Install dependencies:**
+```bash
+npm install
+```
+
+3. **Configure environment:**
+Create a `.env` file in the root directory:
+```bash
+REACT_APP_WEBHOOK_URL=https://falco.app.n8n.cloud/webhook/automation
+```
+
+4. **Start the development server:**
+```bash
+npm start
+```
+
+The application will open at [http://localhost:3000](http://localhost:3000)
+
+5. **Build for production:**
+```bash
+npm run build
+```
+
+---
+
+## 🔧 Configuration
+
+### n8n Webhook Integration
+
+The application communicates with n8n through a unified webhook endpoint:
+- **Webhook URL**: `https://falco.app.n8n.cloud/webhook/automation`
+- **HR Dashboard**: Sends `type: 'hr'` with candidate data and resume PDF
+- **Finance Dashboard**: Sends `type: 'finance'` with invoice details
+
+Both dashboards use the same webhook endpoint, with intelligent routing based on the `type` parameter.
+
+To modify the webhook URL, edit `src/services/api.ts`
+
+---
+
+## 📁 Project Structure
+
+```
+quantum-sync/
+├── src/
+│   ├── components/
+│   │   ├── Layout.tsx           # Main layout with sidebar navigation
+│   │   ├── StatCard.tsx         # Reusable statistics card component
+│   │   ├── Toast.tsx            # Toast notification system
+│   │   └── LoadingSpinner.tsx   # Loading state indicator
+│   ├── pages/
+│   │   ├── HRDashboard.tsx      # HR candidate submission interface
+│   │   └── FinanceDashboard.tsx # Finance invoice submission interface
+│   ├── services/
+│   │   └── api.ts               # API service for n8n webhook communication
+│   ├── App.tsx                  # Main application with routing setup
+│   └── index.css                # Global styles with Tailwind configuration
+├── public/                      # Static assets
+├── n8n-input-validator-FIXED.js # n8n node code for input validation
+└── README.md
+```
+
+---
+
+## 🎨 Design Features
+
+- **AI-Themed Interface**: Futuristic dark mode design with vibrant accent colors
+- **Gradient Backgrounds**: Dynamic purple-to-blue gradients throughout
+- **Smooth Animations**: Framer Motion-powered transitions for enhanced UX
+- **Responsive Design**: Fully responsive layout that works seamlessly on all devices
+- **Glass Morphism**: Modern frosted glass effects for depth and visual hierarchy
+- **Real-Time Feedback**: Instant visual feedback for all user actions
+
+---
+
+## 🔌 API Reference
+
+### Submit HR Candidate
+**Endpoint:** POST to webhook URL  
+**Type:** `multipart/form-data`  
+**Fields:**
+- `type`: 'hr'
+- `name`: Candidate name
+- `email`: Candidate email
+- `skills`: Candidate skills (comma-separated)
+- `experience`: Years of experience
+- `file`: Resume PDF (optional)
+
+### Submit Finance Invoice
+**Endpoint:** POST to webhook URL  
+**Type:** `multipart/form-data`  
+**Fields:**
+- `type`: 'finance'
+- `vendor`: Vendor name
+- `amount`: Invoice amount
+- `date`: Invoice date
+- `invoiceNumber`: Invoice number
+- `lineItems`: Line items (comma-separated)
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+## 👨‍💻 Author
+
+Built with ❤️ by Falco0906
+
+---
+
+**QuantumSync** - Automating the future, one workflow at a time.
 
 ## 🚀 Features
 

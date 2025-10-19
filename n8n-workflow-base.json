@@ -1,0 +1,460 @@
+{
+  "name": "QuantumSync Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "automation",
+        "responseMode": "lastNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [250, 300],
+      "webhookId": "automation"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "conditions": {
+                "string": [
+                  {
+                    "value1": "={{ $json.type }}",
+                    "operation": "equals",
+                    "value2": "hr"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "HR"
+            },
+            {
+              "conditions": {
+                "string": [
+                  {
+                    "value1": "={{ $json.type }}",
+                    "operation": "equals",
+                    "value2": "finance"
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Finance"
+            }
+          ]
+        }
+      },
+      "id": "switch-router",
+      "name": "Route by Type",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [450, 300]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "name",
+              "name": "name",
+              "value": "={{ $json.data.name }}",
+              "type": "string"
+            },
+            {
+              "id": "email",
+              "name": "email",
+              "value": "={{ $json.data.email }}",
+              "type": "string"
+            },
+            {
+              "id": "skills",
+              "name": "skills",
+              "value": "={{ $json.data.skills }}",
+              "type": "array"
+            },
+            {
+              "id": "experience",
+              "name": "experience",
+              "value": "={{ $json.data.experience }}",
+              "type": "number"
+            },
+            {
+              "id": "resumeUrl",
+              "name": "resumeUrl",
+              "value": "={{ $json.data.resumeUrl }}",
+              "type": "string"
+            },
+            {
+              "id": "type",
+              "name": "type",
+              "value": "hr",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "extract-hr-data",
+      "name": "Extract HR Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [650, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const candidate = $input.first().json;\n\nlet score = 0;\n\n// Score based on experience (max 40 points)\nscore += Math.min(candidate.experience * 8, 40);\n\n// Score based on skills count (max 30 points)\nscore += Math.min(candidate.skills.length * 6, 30);\n\n// Base score for complete profile (30 points)\nif (candidate.name && candidate.email && candidate.resumeUrl) {\n  score += 30;\n}\n\nconst finalScore = Math.min(score, 100);\nconst status = finalScore >= 80 ? 'interview' : finalScore >= 50 ? 'review' : 'rejected';\n\nreturn {\n  ...candidate,\n  score: finalScore,\n  status: status,\n  timestamp: new Date().toISOString()\n};"
+      },
+      "id": "calculate-score",
+      "name": "Calculate Candidate Score",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 200]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "conditions": {
+                "number": [
+                  {
+                    "value1": "={{ $json.score }}",
+                    "operation": "largerEqual",
+                    "value2": 80
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "High Score"
+            },
+            {
+              "conditions": {
+                "number": [
+                  {
+                    "value1": "={{ $json.score }}",
+                    "operation": "largerEqual",
+                    "value2": 50
+                  },
+                  {
+                    "value1": "={{ $json.score }}",
+                    "operation": "smaller",
+                    "value2": 80
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Medium Score"
+            },
+            {
+              "conditions": {
+                "number": [
+                  {
+                    "value1": "={{ $json.score }}",
+                    "operation": "smaller",
+                    "value2": 50
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Low Score"
+            }
+          ]
+        }
+      },
+      "id": "route-by-score",
+      "name": "Route by Score",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [1050, 200]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "vendor",
+              "name": "vendor",
+              "value": "={{ $json.data.vendor }}",
+              "type": "string"
+            },
+            {
+              "id": "amount",
+              "name": "amount",
+              "value": "={{ $json.data.amount }}",
+              "type": "number"
+            },
+            {
+              "id": "date",
+              "name": "date",
+              "value": "={{ $json.data.date }}",
+              "type": "string"
+            },
+            {
+              "id": "lineItems",
+              "name": "lineItems",
+              "value": "={{ $json.data.lineItems }}",
+              "type": "array"
+            },
+            {
+              "id": "invoiceNumber",
+              "name": "invoiceNumber",
+              "value": "={{ $json.data.invoiceNumber }}",
+              "type": "string"
+            },
+            {
+              "id": "type",
+              "name": "type",
+              "value": "finance",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "extract-finance-data",
+      "name": "Extract Finance Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3,
+      "position": [650, 400]
+    },
+    {
+      "parameters": {
+        "jsCode": "const invoice = $input.first().json;\n\nlet riskScore = 0;\n\n// High amount risk\nif (invoice.amount > 10000) riskScore += 30;\n\n// Round number suspicion\nif (invoice.amount % 1000 === 0) riskScore += 20;\n\n// Missing line items\nif (!invoice.lineItems || invoice.lineItems.length === 0) {\n  riskScore += 50;\n}\n\nconst finalRiskScore = Math.min(riskScore, 100);\nconst riskLevel = finalRiskScore > 50 ? 'High' : finalRiskScore > 25 ? 'Medium' : 'Low';\nconst status = invoice.amount < 500 ? 'auto-approved' : 'pending';\n\nreturn {\n  ...invoice,\n  riskScore: finalRiskScore,\n  riskLevel: riskLevel,\n  status: status,\n  isDuplicate: false,\n  timestamp: new Date().toISOString()\n};"
+      },
+      "id": "fraud-analysis",
+      "name": "Fraud Risk Analysis",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [850, 400]
+    },
+    {
+      "parameters": {
+        "rules": {
+          "rules": [
+            {
+              "conditions": {
+                "number": [
+                  {
+                    "value1": "={{ $json.amount }}",
+                    "operation": "smaller",
+                    "value2": 500
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Auto-Approve"
+            },
+            {
+              "conditions": {
+                "number": [
+                  {
+                    "value1": "={{ $json.amount }}",
+                    "operation": "largerEqual",
+                    "value2": 500
+                  },
+                  {
+                    "value1": "={{ $json.amount }}",
+                    "operation": "smaller",
+                    "value2": 5000
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "Manager"
+            },
+            {
+              "conditions": {
+                "number": [
+                  {
+                    "value1": "={{ $json.amount }}",
+                    "operation": "largerEqual",
+                    "value2": 5000
+                  }
+                ]
+              },
+              "renameOutput": true,
+              "outputKey": "CFO"
+            }
+          ]
+        }
+      },
+      "id": "route-by-amount",
+      "name": "Route by Amount",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 1,
+      "position": [1050, 400]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "merge-branches",
+      "name": "Merge",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 2,
+      "position": [1500, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ { \"success\": true, \"message\": \"Request processed successfully\", \"type\": $json.type, \"data\": $json } }}"
+      },
+      "id": "respond-webhook",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1700, 300]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Route by Type",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Type": {
+      "main": [
+        [
+          {
+            "node": "Extract HR Data",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Extract Finance Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract HR Data": {
+      "main": [
+        [
+          {
+            "node": "Calculate Candidate Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate Candidate Score": {
+      "main": [
+        [
+          {
+            "node": "Route by Score",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Score": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract Finance Data": {
+      "main": [
+        [
+          {
+            "node": "Fraud Risk Analysis",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fraud Risk Analysis": {
+      "main": [
+        [
+          {
+            "node": "Route by Amount",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Route by Amount": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2025-10-19T00:00:00.000Z",
+  "versionId": "1"
+}
